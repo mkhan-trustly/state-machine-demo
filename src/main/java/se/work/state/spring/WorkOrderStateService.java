@@ -24,7 +24,9 @@ public class WorkOrderStateService {
 
     public WorkOrderStateService(StateMachine<WorkOrderState, WorkOrderEvent> stateMachine) {
         this.stateMachine = stateMachine;
-        stateMachine.startReactively().block(); // Ensure the state machine is started
+        stateMachine
+                .startReactively()
+                .block();
     }
 
     public WorkOrderState applyEvent(WorkOrderState currentState, WorkOrderEvent event) {
@@ -37,8 +39,11 @@ public class WorkOrderStateService {
             throw new IllegalStateException("Invalid transition from %s using event %s".formatted(currentState, event));
         }
 
-        Message<WorkOrderEvent> message = MessageBuilder.withPayload(event).build();
+        Message<WorkOrderEvent> message = MessageBuilder
+                .withPayload(event)
+                .build();
         Mono<Message<WorkOrderEvent>> messageMono = Mono.just(message);
+
         Flux<StateMachineEventResult<WorkOrderState, WorkOrderEvent>> resultFlux = stateMachine.sendEvent(messageMono);
 
         StateMachineEventResult<WorkOrderState, WorkOrderEvent> result = resultFlux.blockFirst();
