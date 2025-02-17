@@ -64,17 +64,17 @@ public class WorkOrderStateService {
                 .collect(Collectors.toSet());
     }
 
-    public void resetStateMachine(WorkOrderState currentState) {
-        stateMachine.getStateMachineAccessor().doWithAllRegions(accessor ->
-                accessor.resetStateMachineReactively(new DefaultStateMachineContext<>(currentState, null, null, null)).block()
-        );
-    }
-
     private Set<WorkOrderState> getNextPossibleStates(WorkOrderEvent event) {
         return stateMachine.getTransitions().stream()
                 .filter(t -> t.getTrigger().getEvent() == event)
                 .map(Transition::getTarget)
                 .map(State::getId)
                 .collect(Collectors.toSet());
+    }
+
+    private void resetStateMachine(WorkOrderState currentState) {
+        stateMachine.getStateMachineAccessor().doWithAllRegions(accessor ->
+                accessor.resetStateMachineReactively(new DefaultStateMachineContext<>(currentState, null, null, null)).block()
+        );
     }
 }
